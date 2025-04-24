@@ -12,9 +12,17 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import com.google.gson.Gson
+import com.tuyiiya.newsapp.data.model.News
 import com.tuyiiya.newsapp.presentation.home.HomeScreen
+import com.tuyiiya.newsapp.presentation.news_details.NewsDetailsScreen
 import com.tuyiiya.newsapp.ui.theme.NewsAppTheme
+import com.tuyiiya.newsapp.utils.NavRoute
 import dagger.hilt.android.AndroidEntryPoint
+import java.net.URLDecoder
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
@@ -25,25 +33,22 @@ class MainActivity : ComponentActivity() {
         setContent {
             NewsAppTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) {
-                    HomeScreen()
+                    val navController = rememberNavController()
+
+                    NavHost(navController = navController, startDestination = "home") {
+                        composable("home") { HomeScreen(navController = navController) }
+
+                        composable("details/news={news}") { backStackEntry ->
+                            val newsJson = backStackEntry.arguments?.getString("news")
+                            if (newsJson != null) {
+                                val decodedJson = URLDecoder.decode(newsJson, "utf-8")
+                                val news = Gson().fromJson(decodedJson, News::class.java)
+                                NewsDetailsScreen(navController = navController, news = news)
+                            }
+                        }
+                    }
                 }
             }
         }
-    }
-}
-
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    NewsAppTheme {
-        Greeting("Android")
     }
 }

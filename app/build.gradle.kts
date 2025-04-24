@@ -80,4 +80,10 @@ dependencies {
 
     // Coil Compose
     implementation(libs.coil.compose)
+
+    // Navigation Compose
+    implementation(libs.androidx.navigation.compose)
+
+    // Constraint Layout
+    implementation(libs.androidx.constraintlayout.compose)
 }

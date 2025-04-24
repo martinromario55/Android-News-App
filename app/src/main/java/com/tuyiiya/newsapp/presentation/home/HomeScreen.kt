@@ -2,6 +2,7 @@ package com.tuyiiya.newsapp.presentation.home
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -30,13 +31,16 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavHostController
 import coil3.compose.AsyncImage
+import com.tuyiiya.newsapp.R
 import com.tuyiiya.newsapp.data.model.News
 import com.tuyiiya.newsapp.presentation.State
-import com.tuyiiya.newsapp.R
+import com.tuyiiya.newsapp.utils.NavRoute
+
 
 @Composable
-fun HomeScreen() {
+fun HomeScreen(navController: NavHostController) {
     val viewModel: HomeViewModel = hiltViewModel()
     val uiState = viewModel.state.collectAsState()
 
@@ -94,7 +98,10 @@ fun HomeScreen() {
                         Text(text = "News")
                     }
                     items(data.news) { article ->
-                        NewsItem(article)
+                        NewsItem(article, onClick = {
+                            val route = NavRoute.createNewsDetailsRoute(article)
+                            navController.navigate(route)
+                        })
                     }
                 }
             }
@@ -104,7 +111,7 @@ fun HomeScreen() {
 
 
 @Composable
-fun NewsItem(news: News) {
+fun NewsItem(news: News, onClick: () -> Unit) {
     Box(
         modifier = Modifier
             .padding(4.dp)
@@ -112,33 +119,39 @@ fun NewsItem(news: News) {
             .height(130.dp)
             .clip(RoundedCornerShape(16.dp))
             .background(Color.Red.copy(alpha = 0.2f))
-            .padding(8.dp)
+            .clickable { onClick() }
     ) {
+        //val imageUrl = news.image ?: ""
+        //Log.d("NewsItem", "Loading image: $imageUrl")
         AsyncImage(
             model = news.image,
             contentDescription = news.title,
             modifier = Modifier.fillMaxSize(),
-            contentScale = ContentScale.Crop
+            contentScale = ContentScale.Crop,
+            placeholder = painterResource(id = R.drawable.news_default),
+            error = painterResource(id = R.drawable.news_default)
         )
 
-        Text(
-            text = news.title,
-            color = Color.White,
-            fontWeight = FontWeight.Bold,
-            modifier = Modifier.align(
-                Alignment.TopCenter
+        Box(modifier = Modifier.fillMaxSize().padding(8.dp)) {
+            Text(
+                text = news.title,
+                color = Color.White,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.align(
+                    Alignment.TopCenter
+                )
             )
-        )
-        Text(
-            text = news.publish_date,
-            color = Color.White,
-            modifier = Modifier.align(Alignment.BottomEnd)
-        )
-        Text(
-            text = news.authors.joinToString(", "),
-            color = Color.White,
-            modifier = Modifier.align(Alignment.BottomStart)
-        )
+            Text(
+                text = news.publish_date,
+                color = Color.White,
+                modifier = Modifier.align(Alignment.BottomEnd)
+            )
+            Text(
+                text = news.authors?.joinToString(", ") ?: "Unknown",
+                color = Color.White,
+                modifier = Modifier.align(Alignment.BottomStart)
+            )
+        }
     }
 }
 
