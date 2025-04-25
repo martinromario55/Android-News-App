@@ -93,18 +93,24 @@ fun HomeScreen(navController: NavHostController) {
             else -> {
                 val data = (uiState.value as State.Success).data
 
-                LazyColumn(modifier = Modifier.fillMaxSize()) {
-                    item {
-                        Text(text = "News")
-                    }
-                    items(data.news) { article ->
-                        NewsItem(article, onClick = {
-                            val route = NavRoute.createNewsDetailsRoute(article)
-                            navController.navigate(route)
-                        })
-                    }
+                NewsListView(news = data.news) {
+                    val route = NavRoute.createNewsDetailsRoute(it)
+                    navController.navigate(route)
                 }
             }
+        }
+    }
+}
+
+
+@Composable
+fun NewsListView(news: List<News>, onClick: (News) -> Unit) {
+    LazyColumn(modifier = Modifier.fillMaxSize()) {
+        item {
+            Text(text = "News")
+        }
+        items(news) { article ->
+            NewsItem(article, onClick = { onClick(article) })
         }
     }
 }
@@ -132,7 +138,9 @@ fun NewsItem(news: News, onClick: () -> Unit) {
             error = painterResource(id = R.drawable.news_default)
         )
 
-        Box(modifier = Modifier.fillMaxSize().padding(8.dp)) {
+        Box(modifier = Modifier
+            .fillMaxSize()
+            .padding(8.dp)) {
             Text(
                 text = news.title,
                 color = Color.White,

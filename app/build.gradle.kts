@@ -7,6 +7,15 @@ plugins {
     id("com.google.dagger.hilt.android")
 }
 
+configurations.all {
+    resolutionStrategy.eachDependency {
+        if (requested.group == "com.intellij" && requested.name == "annotations") {
+            useTarget("org.jetbrains:annotations:23.0.0")
+            because("Unify annotation versions to avoid duplicate class conflict")
+        }
+    }
+}
+
 android {
     namespace = "com.tuyiiya.newsapp"
     compileSdk = 35
@@ -86,4 +95,10 @@ dependencies {
 
     // Constraint Layout
     implementation(libs.androidx.constraintlayout.compose)
+
+    // Room DB Dependencies
+    implementation(libs.androidx.room.runtime)
+    implementation(libs.androidx.room.compiler)
+    implementation(libs.androidx.room.ktx)
+    ksp(libs.androidx.room.compiler)
 }

@@ -6,10 +6,10 @@ import java.net.URLDecoder
 import java.net.URLEncoder
 
 object NavRoute {
-    fun createNewsDetailsRoute(news: News): String {
+    fun createNewsDetailsRoute(news: News, isLocal: Boolean? = false): String {
         val gson = Gson().toJson(news)
         val encodedJson = URLEncoder.encode(gson, "utf-8")
-        return "details/news=$encodedJson"
+        return "details/news=$encodedJson&isLocal=$isLocal"
     }
 
     fun getNewsFromRoute(json: String): News {
